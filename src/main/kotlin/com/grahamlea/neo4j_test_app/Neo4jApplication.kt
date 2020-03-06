@@ -14,7 +14,6 @@ import kotlin.system.exitProcess
 
 @SpringBootApplication
 @EnableNeo4jRepositories("com.grahamlea.neo4j_test_app.model")
-@org.springframework.context.annotation.Configuration
 class GraphApiApplication {
 	private val neo4jUrl = "bolt://localhost:7687"
 
