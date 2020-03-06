@@ -61,25 +61,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.neo4j.test</groupId>
-			<artifactId>neo4j-harness</artifactId>
-			<version>4.0.0</version>
-			<scope>test</scope>
-		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.neo4j</groupId>-->
-<!--			<artifactId>neo4j-kernel</artifactId>-->
-<!--			<version>4.0.0</version>-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>org.neo4j</groupId>-->
-<!--			<artifactId>neo4j-ogm-embedded-driver</artifactId>-->
-<!--			<version>3.2.9</version>-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
-
-		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>neo4j</artifactId>
 			<version>${testcontainers.version}</version>
