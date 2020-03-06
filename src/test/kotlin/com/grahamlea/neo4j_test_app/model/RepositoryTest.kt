@@ -35,7 +35,7 @@ class RepositoryTest(@Autowired val thingRepository: ThingRepository) {
         @JvmStatic
         fun createSomeTestDta() {
             GraphDatabase.driver(databaseServer.boltUrl).let { driver ->
-                driver.session().let {
+                driver.session().use {
                     it.run("unwind range(1,10) as i create (t:Thing {name: 'Thing ' + i}) return t")
                 }
             }
