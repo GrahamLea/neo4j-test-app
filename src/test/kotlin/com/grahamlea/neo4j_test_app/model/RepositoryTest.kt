@@ -1,25 +1,23 @@
 package com.grahamlea.neo4j_test_app.model
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.neo4j.driver.GraphDatabase
+import org.neo4j.harness.Neo4jBuilders
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.test.context.ContextConfiguration
-import org.testcontainers.containers.Neo4jContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
 
-@Testcontainers
-@DataNeo4jTest
+@SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ContextConfiguration(initializers = [RepositoryTest.Initializer::class])
 class RepositoryTest(@Autowired val thingRepository: ThingRepository) {
-
-    class KNeo4jContainer : Neo4jContainer<KNeo4jContainer>("neo4j:4.0.0")
 
     @Test
     internal fun testIt() {
@@ -27,25 +25,28 @@ class RepositoryTest(@Autowired val thingRepository: ThingRepository) {
     }
 
     companion object {
-        @Container
-        private val databaseServer: KNeo4jContainer = KNeo4jContainer().withoutAuthentication()
+        private val neo4j = Neo4jBuilders.newInProcessBuilder().build()
 
-        // Create some test data
         @BeforeAll
         @JvmStatic
         fun createSomeTestData() {
-            GraphDatabase.driver(databaseServer.boltUrl).let { driver ->
+            GraphDatabase.driver(neo4j.boltURI()).let { driver ->
                 driver.session().use {
                     it.run("unwind range(1,10) as i create (t:Thing {name: 'Thing ' + i}) return t")
                 }
             }
+        }
+
+        @AfterAll
+        fun shutdownNeo4j() {
+            neo4j.close()
         }
     }
 
     internal class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
         override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
             TestPropertyValues.of(
-                    "spring.data.neo4j.uri=" + databaseServer.boltUrl,
+                    "spring.data.neo4j.uri=" + neo4j.boltURI(),
                     "spring.data.neo4j.password="
             ).applyTo(configurableApplicationContext.environment)
         }
