@@ -13,7 +13,6 @@ import org.springframework.data.neo4j.transaction.Neo4jTransactionManager
 import kotlin.system.exitProcess
 
 @SpringBootApplication
-@ComponentScan("com.grahamlea.neo4j_test_app")
 @EnableNeo4jRepositories("com.grahamlea.neo4j_test_app.model")
 @org.springframework.context.annotation.Configuration
 class GraphApiApplication {
