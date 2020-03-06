@@ -1,8 +1,10 @@
 package com.grahamlea.neo4j_test_app.model
 
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.neo4j.driver.GraphDatabase
 import org.neo4j.ogm.config.Configuration
-import org.neo4j.ogm.session.SessionFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -20,15 +22,24 @@ class RepositoryTest(@Autowired val thingRepository: ThingRepository) {
 
     @Test
     internal fun testIt() {
-        println(thingRepository.findAll())
+        Assertions.assertThat(thingRepository.findAll()).hasSize(10);
     }
 
     companion object {
-        private lateinit var sessionFactory: SessionFactory
-
         @Container
         private val databaseServer: KNeo4jContainer = KNeo4jContainer().withoutAuthentication()
 
+        // Create some test data
+        @BeforeAll
+        @JvmStatic
+        fun createSomeTestDta() {
+            GraphDatabase.driver(databaseServer.boltUrl).let { driver ->
+                driver.session().let {
+                    it.run("unwind range(1,10) as i create (t:Thing {name: 'Thing ' + i}) return t")
+                }
+            }
+
+        }
     }
 
     @TestConfiguration
